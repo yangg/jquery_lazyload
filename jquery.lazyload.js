@@ -16,30 +16,32 @@
 (function($, window, document, undefined) {
     var $window = $(window);
 
+    var globalSettings = {
+        threshold       : 0,
+        failure_limit   : 0,
+        event           : "scroll",
+        effect          : null,
+        container       : window,
+        data_attribute  : "original",
+        skip_invisible  : false,
+        appear          : null,
+        load            : null,
+        placeholder     : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"
+    };
     $.fn.lazyload = function(options) {
         var elements = this;
         var $container;
-        var settings = {
-            threshold       : 0,
-            failure_limit   : 0,
-            event           : "scroll",
-            effect          : "show",
-            container       : window,
-            data_attribute  : "original",
-            skip_invisible  : false,
-            appear          : null,
-            load            : null,
-            placeholder     : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"
-        };
+        var settings = $.extend({}, globalSettings);
 
         function update() {
             var counter = 0;
-
             elements.each(function() {
                 var $this = $(this);
+
                 if (settings.skip_invisible && !$this.is(":visible")) {
                     return;
                 }
+
                 if ($.abovethetop(this, settings) ||
                     $.leftofbegin(this, settings)) {
                         /* Nothing. */
@@ -72,8 +74,7 @@
         }
 
         /* Cache container as jQuery as object. */
-        $container = (settings.container === undefined ||
-                      settings.container === window) ? $window : $(settings.container);
+        $container = $(settings.container);
 
         /* Fire one scroll event per scroll. Not one scroll event per image. */
         if (0 === settings.event.indexOf("scroll")) {
@@ -89,7 +90,8 @@
             self.loaded = false;
 
             /* If no src attribute given use data:uri. */
-            if ($self.attr("src") === undefined || $self.attr("src") === false) {
+            // fix to compatiable with zepto
+            if (!$self.attr("src") && settings.placeholder) {
                 if ($self.is("img")) {
                     $self.attr("src", settings.placeholder);
                 }
@@ -105,13 +107,13 @@
                     $("<img />")
                         .one("load", function() {
                             var original = $self.attr("data-" + settings.data_attribute);
-                            $self.hide();
+                            settings.effect && $self.hide();
                             if ($self.is("img")) {
                                 $self.attr("src", original);
                             } else {
                                 $self.css("background-image", "url('" + original + "')");
                             }
-                            $self[settings.effect](settings.effect_speed);
+                            settings.effect && $self[settings.effect](settings.effect_speed);
 
                             self.loaded = true;
 
@@ -165,6 +167,9 @@
 
         return this;
     };
+    $.fn.lazyload.setDefaults = function(options) {
+        $.extend(globalSettings, options);
+    }
 
     /* Convenience methods in jQuery namespace.           */
     /* Use as  $.belowthefold(element, {threshold : 100, container : window}) */
@@ -238,4 +243,4 @@
         "left-of-fold"   : function(a) { return !$.rightoffold(a, {threshold : 0}); }
     });
 
-})(jQuery, window, document);
+})($, window, document);
