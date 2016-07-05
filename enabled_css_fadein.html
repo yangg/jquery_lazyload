@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
+  <title>Lazy Load Enabled With FadeIn Effect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  .placeholder {
+    padding-bottom: 75.03%;
+  }
+  </style>
+  <link rel="stylesheet" href="lazyload.css"/>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="img-thumbnail"><div class="placeholder"></div><img data-src="http://www.appelsiini.net/projects/lazyload/img/viper_1.jpg"/></div>
+    <div class="bg-thumbnail" data-src="http://www.appelsiini.net/projects/lazyload/img/bmw_m1_hood.jpg">
+      <div class="placeholder"></div>
+    </div>
+    <div class="bg-thumbnail" data-src="http://www.appelsiini.net/projects/lazyload/img/bmw_m1_side.jpg">
+      <div class="placeholder"></div>
+    </div>
+    <div class="bg-thumbnail" data-src="http://www.appelsiini.net/projects/lazyload/img/viper_1.jpg">
+      <div class="placeholder"></div>
+    </div>
+  </div>
+  <script src="http://s.juancdn.com/common/js/jquery.min.js"></script>
+  <script src="jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" charset="utf-8">
+  $(function() {
+    $.fn.lazyload.setDefaults({
+      data_attribute: 'src',
+      placeholder: false,
+      load: function() {
+        var $this = $(this).addClass('loaded');
+        $this.is('img') && $this.parent().css('background', 'none');
+      }
+    });
+     $("[data-src]").lazyload();
+
+  });
+  </script>
+</body>
+</html>
